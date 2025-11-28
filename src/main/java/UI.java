@@ -11,8 +11,10 @@ public class UI {
         this.password = password;
     }
 
+    MysqlDataSource dataSource = new MysqlDataSource();
+    Scanner scanner = new Scanner(System.in);
+
     public void HomeScreen(){
-        Scanner scanner = new Scanner(System.in);
         boolean in = true;
         while(in){
             System.out.println("""
@@ -36,8 +38,6 @@ public class UI {
     }
 
     public void displayProdcuts(){
-
-        MysqlDataSource dataSource = new MysqlDataSource();
 
         String url = "jdbc:mysql://localhost:3306/northwind";
         String user = this.user;
@@ -72,6 +72,38 @@ public class UI {
     }
 
     public void displayCustomers(){
+
+        String url = "jdbc:mysql://localhost:3306/northwind";
+        String user = this.user;
+        String password = this.password;
+
+        String sql = "SELECT ContactName, CompanyName, City, Country, Phone FROM customers";
+
+        dataSource.setURL(url);
+        dataSource.setUser(user);
+        dataSource.setPassword(password);
+
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            System.out.println("""
+                        ContactName      CompanyName             City       Country    Phone
+                        ---------------- ----------------------- ---------- ---------- -------------
+                        """);
+
+            while (rs.next()) {
+                String ContactName = rs.getString("ContactName");
+                String CompanyName = rs.getString("CompanyName");
+                String City = rs.getString("City");
+                String Country = rs.getString("Country");
+                String Phone = rs.getString("Phone");
+
+                System.out.printf("%-16s %-23s %-11s %-6s %13s %n", ContactName, CompanyName, City, Country, Phone);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 }
