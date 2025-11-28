@@ -2,7 +2,7 @@ import java.sql.*;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
 public class main {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args){
 
         if (args.length != 2) {
             System.out.println("Application needs two arguments to run.");
@@ -15,7 +15,7 @@ public class main {
         String user = args[0];
         String password = args[1];
 
-        String sql = "SELECT ProductName FROM products";
+        String sql = "SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products";
 
         dataSource.setURL(url);
         dataSource.setUser(user);
@@ -25,9 +25,18 @@ public class main {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
 
+            System.out.println("""
+                        ID   Name           Price    Stock  
+                        ---- -------------- -------  ------ 
+                        """);
+
             while (rs.next()) {
+                String ProductID = rs.getString("ProductID");
                 String ProductName = rs.getString("ProductName");
-                System.out.println(ProductName);
+                String UnitPrice = rs.getString("UnitPrice");
+                String UnitsInStock = rs.getString("UnitsInStock");
+
+                System.out.printf("%-4s %-14s %-8s %1s \n", ProductID, ProductName, UnitPrice, UnitsInStock);
             }
         } catch (SQLException e) {
             e.printStackTrace();
