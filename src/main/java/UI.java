@@ -136,5 +136,33 @@ public class UI {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        System.out.println("Select a Category ID to search for products by.");
+        int choice = Integer.parseInt(scanner.nextLine());
+
+            System.out.println("""
+                        ID   Name                   Price    Stock
+                        ---- ---------------------- -------  ------
+                        """);
+
+        String sql1 = "SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products " +
+                "JOIN categories ON products.CategoryID = categories.CategoryID " +
+                "WHERE products.CategoryID = " + choice;
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql1);
+            ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String ProductID = rs.getString("ProductID");
+                String ProductName = rs.getString("ProductName");
+                String UnitPrice = rs.getString("UnitPrice");
+                String UnitsInStock = rs.getString("UnitsInStock");
+
+                System.out.printf("%-4s %-22s %-8s %1s %n", ProductID, ProductName, UnitPrice, UnitsInStock);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
