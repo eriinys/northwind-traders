@@ -56,14 +56,13 @@ public class UI {
 
             System.out.println("""
                         ID   Name           Price    Stock
-                        ---- -------------- -------  ------
-                        """);
+                        ---- -------------- -------  ------""");
 
             while (rs.next()) {
                 String ProductID = rs.getString("ProductID");
                 String ProductName = rs.getString("ProductName");
-                double UnitPrice = Double.parseDouble(rs.getString("UnitPrice"));
-                String UnitsInStock = rs.getString("UnitsInStock");
+                double UnitPrice = rs.getDouble("UnitPrice");
+                int UnitsInStock = rs.getInt("UnitsInStock");
 
                 System.out.printf("%-4s %-14s %-8.2f %1s %n", ProductID, ProductName, UnitPrice, UnitsInStock);
             }
@@ -89,8 +88,7 @@ public class UI {
 
             System.out.println("""
                         ContactName      CompanyName             City       Country    Phone
-                        ---------------- ----------------------- ---------- ---------- -------------
-                        """);
+                        ---------------- ----------------------- ---------- ---------- -------------""");
 
             while (rs.next()) {
                 String ContactName = rs.getString("ContactName");
@@ -123,8 +121,7 @@ public class UI {
 
             System.out.println("""
                         ID  Name
-                        --- --------------
-                        """);
+                        --- --------------""");
 
             while(rs.next()) {
                 String CategoryID = rs.getString("CategoryId");
@@ -142,23 +139,27 @@ public class UI {
 
             System.out.println("""
                         ID   Name                   Price    Stock
-                        ---- ---------------------- -------  ------
-                        """);
+                        ---- ---------------------- -------  ------""");
 
-        String sql1 = "SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products " +
-                "JOIN categories ON products.CategoryID = categories.CategoryID " +
-                "WHERE products.CategoryID = " + choice;
+        String sql1 = """
+                SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products
+                JOIN categories ON products.CategoryID = categories.CategoryID
+                WHERE products.CategoryID = ?""";
+
         try(Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql1);
-            ResultSet rs = ps.executeQuery()) {
+            PreparedStatement ps = conn.prepareStatement(sql1)){
 
-            while (rs.next()) {
-                String ProductID = rs.getString("ProductID");
-                String ProductName = rs.getString("ProductName");
-                double UnitPrice = Double.parseDouble(rs.getString("UnitPrice"));
-                String UnitsInStock = rs.getString("UnitsInStock");
+            ps.setInt(1, choice);
 
-                System.out.printf("%-4s %-22s %-8.2f %1s %n", ProductID, ProductName, UnitPrice, UnitsInStock);
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String ProductID = rs.getString("ProductID");
+                    String ProductName = rs.getString("ProductName");
+                    double UnitPrice = rs.getDouble("UnitPrice");
+                    int UnitsInStock = rs.getInt("UnitsInStock");
+
+                    System.out.printf("%-4s %-22s %-8.2f %1d %n", ProductID, ProductName, UnitPrice, UnitsInStock);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
